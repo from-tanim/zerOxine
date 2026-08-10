@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resource Preview | zerOxine</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .timer-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .timer-text {
+      font-size: 0.875rem;
+      color: var(--subtext);
+    }
+
+    .timer-seconds {
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* SVG Progress Ring */
+    .progress-ring {
+      width: 24px;
+      height: 24px;
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring__circle {
+      stroke: var(--accent);
+      stroke-dasharray: 63; /* 2 * PI * r */
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .preview-container {
+      width: 100%;
+      max-width: 1000px;
+      height: 75vh;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .footer-actions {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--subtext);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <a href="https://zeroxine.vercel.app/" class="brand">zer<span>Oxine</span></a>
+    <div class="timer-badge">
+      <svg class="progress-ring">
+        <circle
+          class="progress-ring__circle"
+          stroke-width="3"
+          fill="transparent"
+          r="10"
+          cx="12"
+          cy="12"
+        />
+      </svg>
+      <span class="timer-text">Redirecting in <span id="countdown" class="timer-seconds">30</span>s</span>
+    </div>
+  </header>
+
+  <main class="preview-container">
+    <!-- Ensure your Google Drive file is shared as "Anyone with the link can view" -->
+    <iframe 
+      src="https://pdfhost.io/v/d2RenCkr8H_Magnetism-SSC
+
+" 
+      allow="autoplay">
+    </iframe>
+  </main>
+
+  <footer class="footer-actions">
+    <button id="cancel-btn" class="btn btn-secondary">Pause Timer</button>
+    <a href="https://zeroxine.vercel.app/" class="btn btn-primary">Skip to zerOxine</a>
+  </footer>
+
+  <script>
+    const REDIRECT_URL = "https://zeroxine.vercel.app/";
+    const TOTAL_SECONDS = 30;
+    
+    let remainingSeconds = TOTAL_SECONDS;
+    let timerInterval = null;
+    
+    const countdownEl = document.getElementById("countdown");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const circle = document.querySelector(".progress-ring__circle");
+    
+    const circumference = 2 * Math.PI * 10;
+
+    function setProgress(percent) {
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        countdownEl.textContent = remainingSeconds;
+
+        const progressPercent = ((TOTAL_SECONDS - remainingSeconds) / TOTAL_SECONDS) * 100;
+        setProgress(progressPercent);
+
+        if (remainingSeconds <= 0) {
+          clearInterval(timerInterval);
+          window.location.href = REDIRECT_URL;
+        }
+      }, 1000);
+    }
+
+    cancelBtn.addEventListener("click", () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        cancelBtn.textContent = "Resume Timer";
+        cancelBtn.classList.remove("btn-secondary");
+        cancelBtn.classList.add("btn-primary");
+      } else {
+        startTimer();
+        cancelBtn.textContent = "Pause Timer";
+        cancelBtn.classList.remove("btn-primary");
+        cancelBtn.classList.add("btn-secondary");
+      }
+    });
+
+    // Initialize
+    startTimer();
+  </script>
+</body>
+</html>
